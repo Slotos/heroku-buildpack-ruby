@@ -7,25 +7,27 @@ BuildDir = ARGV[0]
 CacheDir = ARGV[1]
 
 if pack = LanguagePack.detect(BuildDir, CacheDir)
+  
+  # PhantomJS
+  PhantomVersion="1.5.0"
+  Bucket="stomita-buildpack-phantomjs"
+
+  # s3 packages
+  FileName="buildpack-phantomjs-#{PhantomVersion}.tar.gz"
+  BuildPack="http://#{Bucket}.s3.amazonaws.com/#{FileName}"
+
+  `mkdir -p #{CacheDir}`
+  if !File.exist? "#{CacheDir}/#{FileName}"
+    puts "-----> Fetching PhantomJS buildpack binaries"
+    `curl #{BuildPack} -s -o #{CacheDir}/#{FileName}`
+  end
+
+  puts "-----> Extracting PhantomJS binaries" 
+  `mkdir -p #{BuildDir}/vendor/phantomjs`
+  `tar zxf #{CacheDir}/#{FileName} -C #{BuildDir}/vendor/phantomjs`
+  # PhantomJS: END
+
   pack.log("compile") do
     pack.compile
   end
 end
-
-# PhantomJS
-PhantomVersion="1.5.0"
-Bucket="stomita-buildpack-phantomjs"
-
-# s3 packages
-FileName="buildpack-phantomjs-#{PhantomVersion}.tar.gz"
-BuildPack="http://#{Bucket}.s3.amazonaws.com/#{FileName}"
-
-`mkdir -p #{CacheDir}`
-if !File.exist? "#{CacheDir}/#{FileName}"
-  puts "-----> Fetching PhantomJS buildpack binaries"
-  `curl #{BuildPack} -s -o #{CacheDir}/#{FileName}`
-end
-
-puts "-----> Extracting PhantomJS binaries" 
-`mkdir -p #{BuildDir}/vendor/phantomjs`
-`tar zxf #{CacheDir}/#{FileName} -C #{BuildDir}/vendor/phantomjs`
