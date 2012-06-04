@@ -31,6 +31,7 @@ class LanguagePack::Ruby < LanguagePack::Base
       "LANG"     => "en_US.UTF-8",
       "PATH"     => default_path,
       "GEM_PATH" => slug_vendor_base,
+      "LD_LIBRARY_PATH" => phantomjs_ld_path
     }
 
     ruby_version_jruby? ? vars.merge("JAVA_OPTS" => default_java_opts) : vars
@@ -61,7 +62,11 @@ private
   # the base PATH environment variable to be used
   # @return [String] the resulting PATH
   def default_path
-    "bin:#{slug_vendor_base}/bin:/usr/local/bin:/usr/bin:/bin"
+    "bin:#{slug_vendor_base}/bin:/usr/local/bin:/usr/bin:/bin:/app/vendor/phantomjs/bin"
+  end
+
+  def phantomjs_ld_path
+     "/usr/local/lib:/usr/lib:/lib:/app/vendor/phantomjs/lib"
   end
 
   # the relative path to the bundler directory of gems
